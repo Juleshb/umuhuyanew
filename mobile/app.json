@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "Umuhuza",
+    "slug": "umuhuza",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "umuhuza",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/brand/logo-light.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f9ea8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "rw.umuhuza.online",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true,
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSPhotoLibraryUsageDescription": "Umuhuza uses your photos to add images to property listings."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0f9ea8",
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "rw.umuhuza.online",
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/brand/logo-light.png",
+          "imageWidth": 280,
+          "resizeMode": "contain",
+          "backgroundColor": "#0f9ea8"
+        }
+      ],
+      "expo-secure-store",
+      "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Umuhuza needs access to your photos to add listing images."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

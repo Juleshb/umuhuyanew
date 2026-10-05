@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BUYER
+  AGENT
+  ADMIN
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  LAND
+  COMMERCIAL
+}
+
+enum ListingType {
+  SALE
+  RENT
+}
+
+enum PropertyStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  SOLD
+  RENTED
+}
+
+enum InquiryStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+enum PaymentKind {
+  CONTACT_UNLOCK
+  AGENT_SUBSCRIPTION
+  LISTING_FEE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  name             String
+  phone            String?
+  role             Role      @default(BUYER)
+  avatarUrl        String?
+  agentActiveUntil DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  properties       Property[]
+  favorites        Favorite[]
+  inquiriesAsBuyer Inquiry[]       @relation("InquiryBuyer")
+  inquiriesAsAgent Inquiry[]       @relation("InquiryAgent")
+  payments         Payment[]
+  contactUnlocks   ContactUnlock[]
+
+  @@index([role])
+  @@index([agentActiveUntil])
+}
+
+model Property {
+  id               String         @id @default(cuid())
+  title            String
+  description      String
+  type             PropertyType
+  listingType      ListingType
+  price            Decimal        @db.Decimal(14, 2)
+  currency         String         @default("RWF")
+  bedrooms         Int?
+  bathrooms        Int?
+  sizeSqm          Float?
+  province         String
+  district         String
+  sector           String?
+  cell             String?
+  village          String?
+  address          String?
+  lat              Float?
+  lng              Float?
+  status           PropertyStatus @default(DRAFT)
+  agentId          String
+  expiresAt        DateTime?
+  listingFeePaidAt DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  agent          User            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  images         PropertyImage[]
+  favorites      Favorite[]
+  inquiries      Inquiry[]
+  payments       Payment[]
+  contactUnlocks ContactUnlock[]
+
+  @@index([status])
+  @@index([listingType])
+  @@index([type])
+  @@index([province])
+  @@index([district])
+  @@index([sector])
+  @@index([cell])
+  @@index([price])
+  @@index([agentId])
+  @@index([expiresAt])
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  url        String
+  isPrimary  Boolean  @default(false)
+  propertyId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+}
+
+model Inquiry {
+  id         String        @id @default(cuid())
+  message    String
+  status     InquiryStatus @default(NEW)
+  propertyId String
+  buyerId    String
+  agentId    String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  buyer    User     @relation("InquiryBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  agent    User     @relation("InquiryAgent", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([buyerId])
+  @@index([agentId])
+  @@index([propertyId])
+  @@index([status])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  kind          PaymentKind
+  amount        Int
+  currency      String        @default("RWF")
+  status        PaymentStatus @default(PENDING)
+  reference     String        @unique
+  propertyId    String?
+  provider      String?       // "DPO" | "DEMO"
+  providerToken String?
+  paidAt        DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property?      @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  unlock   ContactUnlock?
+
+  @@index([userId])
+  @@index([kind])
+  @@index([status])
+  @@index([propertyId])
+  @@index([providerToken])
+}
+
+model ContactUnlock {
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  paymentId  String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  payment  Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+  @@index([expiresAt])
+}
+
+model Banner {
+  id        String    @id @default(cuid())
+  kicker    String    @default("Ad")
+  title     String
+  subtitle  String?
+  ctaLabel  String    @default("Learn more")
+  href      String?
+  imageUrl  String
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([isActive, sortOrder])
+}

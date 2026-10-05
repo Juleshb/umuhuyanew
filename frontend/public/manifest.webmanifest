@@ -1,0 +1,47 @@
+{
+  "name": "Umuhuza Online",
+  "short_name": "Umuhuza",
+  "description": "Find, rent, and buy property across Rwanda with trusted local agents.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f9ea8",
+  "theme_color": "#0f9ea8",
+  "lang": "en",
+  "categories": ["business", "lifestyle", "real estate"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse properties",
+      "short_name": "Search",
+      "url": "/properties",
+      "description": "Search homes for rent and sale"
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Open your Umuhuza workspace"
+    }
+  ]
+}
