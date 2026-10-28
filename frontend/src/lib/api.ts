@@ -1,10 +1,13 @@
-// Prefer same-origin paths in production (proxied by next.config rewrites).
+// Production always uses same-origin paths; next.config rewrites proxy to BACKEND_ORIGIN.
+// Never bake http://188... into the client (browsers block HTTPS→HTTP mixed content).
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ??
-  (process.env.NODE_ENV === "production" ? "/api/v1" : "http://localhost:4000/api/v1");
+  process.env.NODE_ENV === "production"
+    ? "/api/v1"
+    : process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
 const UPLOAD_URL =
-  process.env.NEXT_PUBLIC_UPLOAD_URL ??
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:4000");
+  process.env.NODE_ENV === "production"
+    ? ""
+    : process.env.NEXT_PUBLIC_UPLOAD_URL ?? "http://localhost:4000";
 const TOKEN_KEY = "umuhuza_token";
 
 export function mediaUrl(path: string) {

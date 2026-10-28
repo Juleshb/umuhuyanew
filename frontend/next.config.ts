@@ -10,11 +10,9 @@ const withPWA = withPWAInit({
   },
 });
 
-/** Production API host — used only for server-side rewrites (avoids HTTPS→HTTP mixed content). */
+/** Server-only API host for rewrites. Do not expose this as NEXT_PUBLIC_*. */
 const BACKEND_ORIGIN =
-  process.env.BACKEND_ORIGIN?.replace(/\/$/, "") ||
-  process.env.NEXT_PUBLIC_UPLOAD_URL?.replace(/\/$/, "") ||
-  "http://188.137.183.73:4001";
+  process.env.BACKEND_ORIGIN?.replace(/\/$/, "") || "http://188.137.183.73:4001";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost", "172.20.10.3"],
