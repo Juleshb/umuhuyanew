@@ -37,6 +37,10 @@ app.use(
       if (/^http:\/\/(localhost|127\.0\.0\.1|lvh\.me|localtest\.me|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+):\d+$/.test(origin)) {
         return callback(null, true);
       }
+      // Vercel preview + production frontends
+      if (/^https:\/\/([a-z0-9-]+\.)*vercel\.app$/i.test(origin)) {
+        return callback(null, true);
+      }
       return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,

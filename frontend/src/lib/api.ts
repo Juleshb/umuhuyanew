@@ -1,5 +1,10 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
-const UPLOAD_URL = process.env.NEXT_PUBLIC_UPLOAD_URL ?? "http://localhost:4000";
+// Prefer same-origin paths in production (proxied by next.config rewrites).
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "/api/v1" : "http://localhost:4000/api/v1");
+const UPLOAD_URL =
+  process.env.NEXT_PUBLIC_UPLOAD_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:4000");
 const TOKEN_KEY = "umuhuza_token";
 
 export function mediaUrl(path: string) {
