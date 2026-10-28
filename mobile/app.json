@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "umuhuza",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/brand/logo-light.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0f9ea8"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "rw.umuhuza.online",
@@ -31,8 +26,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "rw.umuhuza.online",
-      "usesCleartextTraffic": true
+      "package": "rw.umuhuza.online"
     },
     "web": {
       "bundler": "metro",
@@ -56,6 +50,14 @@
         "expo-image-picker",
         {
           "photosPermission": "Umuhuza needs access to your photos to add listing images."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ],

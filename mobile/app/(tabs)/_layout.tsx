@@ -1,54 +1,55 @@
-import { StyleSheet, View } from "react-native";
-import { BlurView } from "expo-blur";
+import type { ComponentProps } from "react";
+import { Platform, StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { TAB_BAR_HEIGHT, tabBarBottomOffset } from "@/lib/layout";
+import { ANDROID_TAB_CONTENT_HEIGHT } from "@/lib/layout";
 import { colors } from "@/lib/theme";
 
-function TabBarBackground() {
-  return (
-    <View style={styles.tabShell}>
-      <BlurView intensity={64} tint="light" style={styles.blur} />
-      <View style={styles.tabTint} />
-    </View>
-  );
+type IconName = ComponentProps<typeof Ionicons>["name"];
+
+function AndroidTabIcon({
+  focused,
+  outline,
+  filled,
+  color,
+}: {
+  focused: boolean;
+  outline: IconName;
+  filled: IconName;
+  color: string;
+}) {
+  return <Ionicons name={focused ? filled : outline} size={22} color={color} />;
 }
 
-export default function TabLayout() {
+function AndroidTabs() {
   const insets = useSafeAreaInsets();
-  const bottom = tabBarBottomOffset(insets.bottom);
+  // Lift tab items above system nav / gesture bar on edge-to-edge Android
+  const bottomPad = Math.max(insets.bottom, 10);
+  const tabBarHeight = ANDROID_TAB_CONTENT_HEIGHT + bottomPad;
 
   return (
     <Tabs
+      safeAreaInsets={{ bottom: 0, top: 0, left: 0, right: 0 }}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.teal,
-        tabBarInactiveTintColor: "rgba(20,32,34,0.38)",
+        tabBarShowLabel: true,
         tabBarHideOnKeyboard: true,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: {
-          position: "absolute",
-          left: 16,
-          right: 16,
-          bottom,
-          height: TAB_BAR_HEIGHT,
-          borderRadius: 20,
-          backgroundColor: "transparent",
-          borderTopWidth: 0,
-          shadowColor: "#142022",
-          shadowOpacity: 0.1,
-          shadowRadius: 16,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 8,
-        },
-        tabBarItemStyle: {
-          paddingTop: 4,
-        },
+        tabBarActiveTintColor: colors.teal,
+        tabBarInactiveTintColor: colors.muted,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: "600",
-          marginBottom: 5,
+          fontWeight: "700",
+        },
+        tabBarStyle: {
+          backgroundColor: colors.white,
+          borderTopColor: colors.line,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          elevation: 8,
+          height: tabBarHeight,
+          paddingBottom: bottomPad,
+          paddingTop: 6,
         },
       }}
     >
@@ -56,8 +57,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={22} color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <AndroidTabIcon focused={focused} color={color} outline="home-outline" filled="home" />
           ),
         }}
       />
@@ -65,8 +66,8 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: "Explore",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "search" : "search-outline"} size={22} color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <AndroidTabIcon focused={focused} color={color} outline="search-outline" filled="search" />
           ),
         }}
       />
@@ -74,8 +75,8 @@ export default function TabLayout() {
         name="saved"
         options={{
           title: "Saved",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "heart" : "heart-outline"} size={22} color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <AndroidTabIcon focused={focused} color={color} outline="heart-outline" filled="heart" />
           ),
         }}
       />
@@ -83,8 +84,8 @@ export default function TabLayout() {
         name="account"
         options={{
           title: "Account",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={22} color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <AndroidTabIcon focused={focused} color={color} outline="person-outline" filled="person" />
           ),
         }}
       />
@@ -92,31 +93,46 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabShell: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: "hidden",
-    borderRadius: 20,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(20,32,34,0.08)",
-  },
-  blur: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-  tabTint: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: "rgba(255,255,255,0.82)",
-  },
-});
+function IOSNativeTabs() {
+  return (
+    <NativeTabs
+      tintColor={colors.teal}
+      iconColor={{
+        default: "rgba(20,32,34,0.45)",
+        selected: colors.teal,
+      }}
+      labelStyle={{
+        default: { color: "rgba(20,32,34,0.45)", fontSize: 11, fontWeight: "600" },
+        selected: { color: colors.teal, fontSize: 11, fontWeight: "700" },
+      }}
+      // Pre–iOS 26 fallback; ignored when system Liquid Glass draws the bar
+      blurEffect="systemChromeMaterial"
+      minimizeBehavior="automatic"
+      disableTransparentOnScrollEdge={false}
+    >
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="explore">
+        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "magnifyingglass", selected: "magnifyingglass" }} />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="saved">
+        <NativeTabs.Trigger.Label>Saved</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "heart", selected: "heart.fill" }} />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="account">
+        <NativeTabs.Trigger.Label>Account</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "person", selected: "person.fill" }} />
+      </NativeTabs.Trigger>
+    </NativeTabs>
+  );
+}
+
+export default function TabLayout() {
+  if (Platform.OS === "ios") {
+    return <IOSNativeTabs />;
+  }
+  return <AndroidTabs />;
+}
