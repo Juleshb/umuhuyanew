@@ -11,7 +11,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { BrandLogo } from "@/components/BrandMark";
 import { Button, Input } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
-import { colors, radius } from "@/lib/theme";
+import { colors } from "@/lib/theme";
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -68,10 +68,6 @@ export default function LoginScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button title={loading ? "Signing in…" : "Log in"} loading={loading} onPress={onSubmit} />
         <Button title="Create an account" variant="ghost" onPress={() => router.push("/register")} />
-        <View style={styles.demo}>
-          <Text style={styles.demoTitle}>Demo · password123</Text>
-          <Text style={styles.demoText}>buyer@umuhuza.rw · claire@umuhuza.rw</Text>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -89,13 +85,4 @@ const styles = StyleSheet.create({
   },
   sub: { color: colors.muted, fontSize: 15, marginBottom: 4, lineHeight: 22 },
   error: { color: colors.orange, fontWeight: "600" },
-  demo: {
-    backgroundColor: colors.canvas,
-    borderRadius: radius.md,
-    padding: 12,
-    gap: 4,
-    marginTop: 8,
-  },
-  demoTitle: { fontWeight: "600", color: colors.ink, fontSize: 12 },
-  demoText: { color: colors.muted, fontSize: 12 },
 });

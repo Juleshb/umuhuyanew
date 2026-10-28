@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChipRow } from "@/components/ChipRow";
@@ -84,8 +84,36 @@ export default function ExploreScreen() {
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Explore</Text>
-        <Text style={styles.sub}>Homes for sale and rent across Rwanda</Text>
+        <View style={styles.titleRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Explore</Text>
+            <Text style={styles.sub}>Homes for sale and rent across Rwanda</Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Search on map"
+            onPress={() =>
+              router.push({
+                pathname: "/map",
+                params: {
+                  q: filters.q,
+                  listingType: filters.listingType,
+                  type: filters.type,
+                  province: filters.province,
+                  district: filters.district,
+                  minPrice: filters.minPrice,
+                  maxPrice: filters.maxPrice,
+                  bedrooms: filters.bedrooms,
+                  status: filters.status,
+                },
+              })
+            }
+            style={({ pressed }) => [styles.mapBtn, pressed && { opacity: 0.78 }]}
+          >
+            <Ionicons name="map-outline" size={18} color={colors.tealDeep} />
+            <Text style={styles.mapBtnText}>Map</Text>
+          </Pressable>
+        </View>
 
         <View style={styles.searchRow}>
           <View style={{ flex: 1 }}>
@@ -209,6 +237,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
   title: {
     fontSize: 28,
     fontWeight: "700",
@@ -216,9 +249,24 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   sub: {
-    marginTop: -6,
+    marginTop: 2,
     color: colors.muted,
     fontSize: 14,
+  },
+  mapBtn: {
+    marginTop: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: colors.tealSoft,
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  mapBtnText: {
+    color: colors.tealDeep,
+    fontWeight: "700",
+    fontSize: 13,
   },
   searchRow: {
     flexDirection: "row",

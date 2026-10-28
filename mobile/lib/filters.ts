@@ -52,7 +52,10 @@ export function countSheetFilters(filters: PropertyFilters) {
   ].filter(Boolean).length;
 }
 
-export function buildPropertyQuery(filters: PropertyFilters) {
+export function buildPropertyQuery(
+  filters: PropertyFilters,
+  options?: { limit?: number }
+) {
   const search = new URLSearchParams();
   if (filters.q.trim()) search.set("q", filters.q.trim());
   if (filters.listingType) search.set("listingType", filters.listingType);
@@ -63,7 +66,7 @@ export function buildPropertyQuery(filters: PropertyFilters) {
   if (filters.maxPrice) search.set("maxPrice", filters.maxPrice);
   if (filters.bedrooms) search.set("bedrooms", filters.bedrooms);
   if (filters.status) search.set("status", filters.status);
-  search.set("limit", "24");
+  search.set("limit", String(options?.limit ?? 24));
   return search.toString();
 }
 

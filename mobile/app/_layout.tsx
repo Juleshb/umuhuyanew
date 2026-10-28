@@ -60,6 +60,10 @@ export default function RootLayout() {
             <Stack.Screen name="login" options={{ title: "Log in", presentation: "modal" }} />
             <Stack.Screen name="register" options={{ title: "Create account" }} />
             <Stack.Screen name="property/[id]" options={{ title: "Property" }} />
+            <Stack.Screen
+              name="map"
+              options={{ title: "Map search", headerShown: false, presentation: "fullScreenModal" }}
+            />
             <Stack.Screen name="inquiries" options={{ title: "Inquiries" }} />
             <Stack.Screen name="listings" options={{ title: "My listings" }} />
             <Stack.Screen name="listing-new" options={{ title: "New listing" }} />
