@@ -5,7 +5,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ImageGallery } from "@/components/ImageGallery";
-import { Badge, Button, EmptyState, Input, Spinner } from "@/components/ui";
+import { Badge, Button, EmptyState, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatLocation, formatPrice } from "@/lib/location";
@@ -17,7 +17,6 @@ export default function PropertyDetailScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [message, setMessage] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -31,20 +30,6 @@ export default function PropertyDetailScreen() {
     onSuccess: () => {
       setNotice("Saved to favorites.");
       void queryClient.invalidateQueries({ queryKey: ["favorites"] });
-    },
-    onError: (err: Error) => setNotice(err.message),
-  });
-
-  const inquiry = useMutation({
-    mutationFn: () =>
-      api("/inquiries", {
-        method: "POST",
-        json: { propertyId: id, message },
-      }),
-    onSuccess: () => {
-      setMessage("");
-      setNotice("Inquiry sent to the agent.");
-      void queryClient.invalidateQueries({ queryKey: ["inquiries"] });
     },
     onError: (err: Error) => setNotice(err.message),
   });
@@ -139,19 +124,6 @@ export default function PropertyDetailScreen() {
           </View>
 
           {notice ? <Text style={styles.notice}>{notice}</Text> : null}
-
-          {!closed ? (
-            <View style={{ gap: 10, marginTop: 8 }}>
-              <Text style={styles.section}>Send an inquiry</Text>
-              <Input
-                placeholder="Hi, I would like to visit this property…"
-                value={message}
-                onChangeText={setMessage}
-                multiline
-                style={{ minHeight: 100, textAlignVertical: "top" }}
-              />
-            </View>
-          ) : null}
         </View>
       </ScrollView>
 
@@ -168,11 +140,17 @@ export default function PropertyDetailScreen() {
             color={favorite.isSuccess ? colors.orange : colors.tealDeep}
           />
         </Pressable>
-        {!closed ? (
+        {!closed && user?.id !== property.agentId ? (
           <Button
-            title="Send inquiry"
-            loading={inquiry.isPending}
-            onPress={() => requireAuth(() => inquiry.mutate())}
+            title="Message agent"
+            onPress={() =>
+              requireAuth(() =>
+                router.push({
+                  pathname: "/chat/[propertyId]",
+                  params: { propertyId: id },
+                })
+              )
+            }
             style={{ flex: 1 }}
           />
         ) : (

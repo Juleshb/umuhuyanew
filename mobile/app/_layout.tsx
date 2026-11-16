@@ -65,6 +65,7 @@ export default function RootLayout() {
               options={{ title: "Map search", headerShown: false, presentation: "fullScreenModal" }}
             />
             <Stack.Screen name="inquiries" options={{ title: "Inquiries" }} />
+            <Stack.Screen name="chat/[propertyId]" options={{ title: "Message" }} />
             <Stack.Screen name="listings" options={{ title: "My listings" }} />
             <Stack.Screen name="listing-new" options={{ title: "New listing" }} />
           </Stack>

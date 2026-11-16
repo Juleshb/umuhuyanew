@@ -1,7 +1,8 @@
 {
   "cli": {
     "version": ">= 16.0.0",
-    "appVersionSource": "local"
+    "appVersionSource": "local",
+    "requireCommit": false
   },
   "build": {
     "development": {
@@ -25,12 +26,18 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "http://188.137.183.73:4001/api/v1",
         "EXPO_PUBLIC_UPLOAD_URL": "http://188.137.183.73:4001",
-        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "318912348663-603vm55jd8fuur101lpbsf5453u4aepf.apps.googleusercontent.com",
-        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "318912348663-hv19jmqa918ihnqc4cf712hp6i55hn1f.apps.googleusercontent.com"
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "128200835257-eg9638ml1ikkvfhvc21o57a966onpbe5.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "128200835257-8fckpbs03d36q5ad8hocboskf89nqnnu.apps.googleusercontent.com"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./google-play-service-account.json",
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    }
   }
 }

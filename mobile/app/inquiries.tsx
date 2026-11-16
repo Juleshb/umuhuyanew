@@ -1,4 +1,5 @@
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChipRow } from "@/components/ChipRow";
 import { EmptyState, Spinner } from "@/components/ui";
@@ -32,12 +33,12 @@ export default function InquiriesScreen() {
   if (isLoading) return <Spinner />;
   if (error) return <EmptyState title="Could not load inquiries" />;
 
-  const inquiries = data?.data ?? [];
+  const threads = groupThreads(data?.data ?? [], isAgent);
 
   return (
     <FlatList
-      data={inquiries}
-      keyExtractor={(item) => item.id}
+      data={threads}
+      keyExtractor={(item) => item.key}
       contentContainerStyle={styles.list}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />
@@ -54,22 +55,36 @@ export default function InquiriesScreen() {
       }
       renderItem={({ item }) => (
         <View style={styles.card}>
-          <Text style={styles.title}>{item.property.title}</Text>
-          <Text style={styles.meta}>{formatLocation(item.property)}</Text>
-          {item.property.price != null ? (
-            <Text style={styles.price}>
-              {formatPrice(item.property.price, item.property.currency)}
+          <Pressable
+            accessibilityRole="button"
+            onPress={() =>
+              router.push({
+                pathname: "/chat/[propertyId]",
+                params: {
+                  propertyId: item.propertyId,
+                  ...(item.buyerId ? { buyerId: item.buyerId } : {}),
+                },
+              })
+            }
+          >
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.meta}>{item.location}</Text>
+            {item.price != null ? (
+              <Text style={styles.price}>{formatPrice(item.price, item.currency)}</Text>
+            ) : null}
+            <Text style={styles.message} numberOfLines={2}>
+              {item.lastMessage}
             </Text>
-          ) : null}
-          <Text style={styles.message}>{item.message}</Text>
-          <Text style={styles.who}>
-            {isAgent ? `From ${item.buyer.name}` : `To ${item.agent.name}`} · {item.status}
-          </Text>
+            <Text style={styles.who}>
+              {isAgent ? `From ${item.peerName}` : `To ${item.peerName}`} · {item.count}{" "}
+              {item.count === 1 ? "message" : "messages"}
+            </Text>
+          </Pressable>
           {isAgent ? (
             <ChipRow
               value={item.status}
               onChange={(status) =>
-                statusMutation.mutate({ id: item.id, status: status as InquiryStatus })
+                statusMutation.mutate({ id: item.latestId, status: status as InquiryStatus })
               }
               options={[
                 { value: "NEW", label: "New" },
@@ -82,6 +97,40 @@ export default function InquiriesScreen() {
       )}
     />
   );
+}
+
+function groupThreads(inquiries: Inquiry[], isAgent: boolean) {
+  const groups = new Map<string, Inquiry[]>();
+  for (const item of inquiries) {
+    const key = isAgent ? `${item.property.id}:${item.buyer.id}` : item.property.id;
+    const list = groups.get(key) ?? [];
+    list.push(item);
+    groups.set(key, list);
+  }
+
+  return [...groups.entries()]
+    .map(([key, items]) => {
+      const sorted = [...items].sort(
+        (a, b) => +new Date(a.createdAt) - +new Date(b.createdAt)
+      );
+      const last = sorted[sorted.length - 1];
+      return {
+        key,
+        propertyId: last.property.id,
+        buyerId: isAgent ? last.buyer.id : undefined,
+        title: last.property.title,
+        location: formatLocation(last.property),
+        price: last.property.price,
+        currency: last.property.currency,
+        lastMessage: last.message,
+        peerName: isAgent ? last.buyer.name : last.agent.name,
+        status: last.status,
+        latestId: last.id,
+        count: sorted.length,
+        updatedAt: last.createdAt,
+      };
+    })
+    .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
 }
 
 const styles = StyleSheet.create({
