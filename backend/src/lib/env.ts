@@ -17,4 +17,9 @@ export const env = {
   UPLOAD_DIR: process.env.UPLOAD_DIR ?? "uploads",
   DPO_COMPANY_TOKEN: process.env.DPO_COMPANY_TOKEN || "",
   DPO_SERVICE_TYPE: process.env.DPO_SERVICE_TYPE || "",
+  /** Comma-separated Google OAuth client IDs (web / iOS / Android) allowed as ID-token audiences. */
+  GOOGLE_CLIENT_IDS: (process.env.GOOGLE_CLIENT_IDS || process.env.GOOGLE_CLIENT_ID || "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
 };

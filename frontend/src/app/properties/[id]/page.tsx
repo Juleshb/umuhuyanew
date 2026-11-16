@@ -10,7 +10,6 @@ import { formatLocation, formatLocationLines } from "@/lib/location";
 import { hasCoordinates } from "@/lib/map";
 import { PropertyMap } from "@/components/map";
 import { PropertyShare } from "@/components/property-share";
-import { PaymentCheckout } from "@/components/payment-checkout";
 import type { Property } from "@/lib/types";
 
 export default function PropertyDetailPage() {
@@ -336,28 +335,19 @@ export default function PropertyDetailPage() {
                   <p className="mt-0.5 truncate text-lg font-semibold text-[#0b1c2c]">
                     {property.agent.name}
                   </p>
-                  {property.contactUnlocked ? (
-                    <>
-                      {property.agent.phone ? (
-                        <a
-                          href={`tel:${property.agent.phone}`}
-                          className="text-sm text-ink/60 hover:text-teal"
-                        >
-                          {property.agent.phone}
-                        </a>
-                      ) : (
-                        <p className="text-sm text-ink/50">{property.agent.email}</p>
-                      )}
-                      {property.unlockExpiresAt ? (
-                        <p className="mt-1 text-xs text-ink/45">
-                          Access until{" "}
-                          {new Date(property.unlockExpiresAt).toLocaleDateString()}
-                        </p>
-                      ) : null}
-                    </>
+                  {property.agent.phone ? (
+                    <a
+                      href={`tel:${property.agent.phone}`}
+                      className="text-sm text-ink/60 hover:text-teal"
+                    >
+                      {property.agent.phone}
+                    </a>
                   ) : (
-                    <p className="text-sm text-ink/50">Contact locked — unlock to view & inquire</p>
+                    <p className="text-sm text-ink/50">{property.agent.email}</p>
                   )}
+                  {property.agent.phone && property.agent.email ? (
+                    <p className="text-sm text-ink/50">{property.agent.email}</p>
+                  ) : null}
                 </div>
               </div>
 
@@ -373,24 +363,6 @@ export default function PropertyDetailPage() {
                 <PropertyShare property={property} compact />
               </div>
 
-              {!isClosed && !property.contactUnlocked && user?.id !== property.agentId ? (
-                <div className="mt-6 border-t border-slate-100 pt-6">
-                  <PaymentCheckout
-                    kind="CONTACT_UNLOCK"
-                    propertyId={property.id}
-                    amount={property.contactUnlockPrice ?? 5000}
-                    title="Unlock contact & visit"
-                    description="Pay once to view seller/agent details, send inquiries, and arrange a visit. Access lasts 1 week."
-                    onPaid={() => {
-                      void queryClient.invalidateQueries({
-                        queryKey: ["property", params.id],
-                      });
-                      setNotice("Contact unlocked for 1 week.");
-                    }}
-                  />
-                </div>
-              ) : null}
-
               {isClosed ? (
                 <div className="mt-6 border-t border-slate-100 pt-6">
                   <h2 className="font-display text-xl text-[#0b1c2c]">Inquiries closed</h2>
@@ -405,7 +377,7 @@ export default function PropertyDetailPage() {
                     Browse available homes
                   </Link>
                 </div>
-              ) : property.contactUnlocked || user?.id === property.agentId ? (
+              ) : user?.id !== property.agentId ? (
                 <form
                   onSubmit={onInquire}
                   className="mt-6 space-y-3 border-t border-slate-100 pt-6"

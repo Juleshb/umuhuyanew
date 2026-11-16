@@ -13,29 +13,14 @@ const freeStart = {
     "Browse approved listings nationwide",
     "Filter by buy, rent, district & map",
     "Save favorites and create an account",
-    "Upgrade only when you need contact or posting",
+    "View agent phone and email for free",
+    "Send inquiries and request a visit for free",
   ],
   cta: { href: "/register", label: "Create free account" },
   secondary: { href: "/properties", label: "Browse properties" },
 };
 
 const paidPlans = [
-  {
-    id: "unlock",
-    name: "Contact unlock",
-    amount: 5000,
-    badge: "Buyers & renters",
-    period: "Per property · 7 days",
-    summary: "Unlock seller details and arrange a visit.",
-    points: [
-      "View agent phone & email",
-      "Send inquiries and meeting requests",
-      "Access valid for one full week",
-      "Covers visiting coordination",
-    ],
-    cta: { href: "/properties", label: "Find a home to unlock" },
-    featured: false,
-  },
   {
     id: "agent",
     name: "Agent Pro",
@@ -105,11 +90,11 @@ export default function PricingPage() {
             Umuhuza Pricing
           </p>
           <h1 className="animate-rise mt-3 max-w-3xl font-display text-4xl leading-[1.1] text-[#0b1c2c] sm:text-5xl md:text-6xl">
-            Start free. Pay only when you connect or list.
+            Start free. Contact agents at no cost.
           </h1>
           <p className="animate-rise-delay mt-4 max-w-2xl text-base leading-relaxed text-ink/65 sm:text-lg">
-            Browse Rwanda properties at no cost. Unlock contact for visits, activate as an agent,
-            or post a private listing — clear fees, no surprises.
+            Browse Rwanda properties and message agents for free. Pay only to activate an agent
+            account or post a private listing.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -130,7 +115,7 @@ export default function PricingPage() {
 
       {/* Free + paid plans */}
       <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
-        <div className="grid gap-5 lg:grid-cols-4">
+        <div className="grid gap-5 lg:grid-cols-3">
           {/* Free Get Started */}
           <article className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-teal/25 bg-[linear-gradient(160deg,#ffffff_0%,#f0fafa_100%)] p-6 shadow-[0_18px_50px_rgba(11,28,44,0.06)] lg:col-span-1">
             <span className="inline-flex w-fit rounded-full bg-teal px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
@@ -166,7 +151,7 @@ export default function PricingPage() {
           </article>
 
           {/* Paid plans */}
-          <div className="grid gap-5 sm:grid-cols-3 lg:col-span-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:col-span-2">
             {paidPlans.map((plan) => (
               <article
                 key={plan.id}
@@ -297,7 +282,7 @@ export default function PricingPage() {
                         ? new Date(user.agentActiveUntil).toLocaleDateString()
                         : "—"
                     }. Keep listing, answering inquiries, and growing your pipeline.`
-                  : "Create a free account to browse and save homes. Upgrade only when you need contact unlock, agent tools, or a private listing."}
+                  : "Create a free account to browse, save homes, and contact agents. Upgrade only when you need agent tools or a private listing."}
               </p>
             </div>
             <div className="flex flex-col justify-center gap-3 sm:items-end">
@@ -338,8 +323,8 @@ export default function PricingPage() {
               },
               {
                 step: "02",
-                title: "Unlock or activate",
-                text: "Pay 5,000 RWF to contact a seller for a week, or 15,000 RWF/month to run as an agent.",
+                title: "Contact for free",
+                text: "View the agent’s phone and email, then send an inquiry or request a visit at no charge.",
               },
               {
                 step: "03",
@@ -366,9 +351,8 @@ export default function PricingPage() {
               Transparent fees for Rwanda’s property market
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-ink/65">
-              Umuhuza keeps browsing free so more people can discover homes. You only pay when
-              value is clear — contacting a seller, running an agent account, or publishing a
-              private listing.
+              Umuhuza keeps browsing and contacting agents free. You only pay to run an agent
+              account or publish a private listing.
             </p>
           </div>
           <div className="space-y-3">
@@ -378,8 +362,8 @@ export default function PricingPage() {
                 a: "No. Searching, filtering, and map explore are free.",
               },
               {
-                q: "What does 5,000 RWF cover?",
-                a: "One week of seller/agent contact, inquiries, and visit coordination for that listing.",
+                q: "Do I pay to contact an agent?",
+                a: "No. Viewing phone and email, sending an inquiry, and requesting a visit are free.",
               },
               {
                 q: "What if my private listing expires?",

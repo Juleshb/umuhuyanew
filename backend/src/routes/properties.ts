@@ -231,37 +231,14 @@ router.get("/:id", optionalAuth, async (req, res, next) => {
       return res.status(404).json({ error: "This listing has expired" });
     }
 
-    let contactUnlocked = Boolean(isOwner || isAdmin);
-    let unlockExpiresAt: Date | null = null;
-    if (!contactUnlocked && req.user?.id) {
-      const unlock = await prisma.contactUnlock.findUnique({
-        where: {
-          userId_propertyId: { userId: req.user.id, propertyId: property.id },
-        },
-      });
-      if (unlock && unlock.expiresAt.getTime() > Date.now()) {
-        contactUnlocked = true;
-        unlockExpiresAt = unlock.expiresAt;
-      }
-    }
-
     const serialized = serializeProperty(property) as Record<string, unknown>;
-    if (!contactUnlocked) {
-      serialized.agent = {
-        id: property.agent.id,
-        name: property.agent.name,
-        email: null,
-        phone: null,
-        avatarUrl: property.agent.avatarUrl,
-      };
-    }
 
     return res.json({
       data: {
         ...serialized,
-        contactUnlocked,
-        unlockExpiresAt,
-        contactUnlockPrice: PRICING.CONTACT_UNLOCK,
+        contactUnlocked: true,
+        unlockExpiresAt: null,
+        contactUnlockPrice: 0,
         listingFeePrice: PRICING.LISTING_FEE,
       },
     });

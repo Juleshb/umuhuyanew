@@ -31,26 +31,6 @@ router.post("/", authenticate, async (req, res, next) => {
       return res.status(400).json({ error: "You cannot inquire on your own listing" });
     }
 
-    if (req.user!.role !== "ADMIN") {
-      const unlock = await prisma.contactUnlock.findUnique({
-        where: {
-          userId_propertyId: {
-            userId: req.user!.id,
-            propertyId: property.id,
-          },
-        },
-      });
-      if (!unlock || unlock.expiresAt.getTime() <= Date.now()) {
-        return res.status(402).json({
-          error:
-            "Pay 5,000 RWF to unlock seller contact and send inquiries (valid for 1 week)",
-          code: "CONTACT_UNLOCK_REQUIRED",
-          amount: 5000,
-          propertyId: property.id,
-        });
-      }
-    }
-
     const inquiry = await prisma.inquiry.create({
       data: {
         message: data.message,

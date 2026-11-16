@@ -15,7 +15,8 @@
           "NSAllowsLocalNetworking": true,
           "NSAllowsArbitraryLoads": true
         },
-        "NSPhotoLibraryUsageDescription": "Umuhuza uses your photos to add images to property listings."
+        "NSPhotoLibraryUsageDescription": "Umuhuza uses your photos to add images to property listings.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

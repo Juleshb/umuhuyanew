@@ -23,6 +23,7 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  loginWithGoogle: (idToken: string) => Promise<User>;
   register: (input: RegisterInput) => Promise<User>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -75,6 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data.user;
   }, []);
 
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    const data = await api<{ user: User; token: string }>("/auth/google", {
+      method: "POST",
+      json: { idToken },
+    });
+    requestId.current += 1;
+    await setStoredToken(data.token);
+    setUser(data.user);
+    setLoading(false);
+    return data.user;
+  }, []);
+
   const register = useCallback(async (input: RegisterInput) => {
     const data = await api<{ user: User; token: string }>("/auth/register", {
       method: "POST",
@@ -105,8 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout, refresh, hasRole }),
-    [user, loading, login, register, logout, refresh, hasRole]
+    () => ({ user, loading, login, loginWithGoogle, register, logout, refresh, hasRole }),
+    [user, loading, login, loginWithGoogle, register, logout, refresh, hasRole]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

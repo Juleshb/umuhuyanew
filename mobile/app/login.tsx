@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,35 +9,55 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { BrandLogo } from "@/components/BrandMark";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { Button, Input } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 import { colors } from "@/lib/theme";
 
 export default function LoginScreen() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const { next } = useLocalSearchParams<{ next?: string }>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  function redirectAfterLogin(role: string) {
+    if (next) {
+      router.replace(next as never);
+    } else if (role === "AGENT" || role === "ADMIN") {
+      router.replace("/listings");
+    } else {
+      router.replace("/account");
+    }
+  }
+
   async function onSubmit() {
     setLoading(true);
     setError(null);
     try {
       const user = await login(email, password);
-      if (next) {
-        router.replace(next as never);
-      } else if (user.role === "AGENT" || user.role === "ADMIN") {
-        router.replace("/listings");
-      } else {
-        router.replace("/account");
-      }
+      redirectAfterLogin(user.role);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
     }
   }
+
+  const onGoogleToken = useCallback(
+    async (idToken: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const user = await loginWithGoogle(idToken);
+        redirectAfterLogin(user.role);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Google sign-in failed");
+        setLoading(false);
+      }
+    },
+    [loginWithGoogle, next]
+  );
 
   return (
     <KeyboardAvoidingView
@@ -48,6 +68,19 @@ export default function LoginScreen() {
         <BrandLogo height={48} />
         <Text style={styles.title}>Welcome back</Text>
         <Text style={styles.sub}>Log in to save favorites and manage your listings.</Text>
+
+        <GoogleSignInButton
+          disabled={loading}
+          onIdToken={onGoogleToken}
+          onError={setError}
+        />
+
+        <View style={styles.dividerRow}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerLabel}>or</Text>
+          <View style={styles.divider} />
+        </View>
+
         <Input
           label="Email"
           icon="mail-outline"
@@ -84,5 +117,23 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   sub: { color: colors.muted, fontSize: 15, marginBottom: 4, lineHeight: 22 },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginVertical: 2,
+  },
+  divider: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.line,
+  },
+  dividerLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
   error: { color: colors.orange, fontWeight: "600" },
 });

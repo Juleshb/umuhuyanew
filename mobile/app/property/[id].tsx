@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ImageGallery } from "@/components/ImageGallery";
 import { Badge, Button, EmptyState, Input, Spinner } from "@/components/ui";
-import { ApiError, api } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatLocation, formatPrice } from "@/lib/location";
 import { colors, radius, elevation } from "@/lib/theme";
@@ -46,15 +46,7 @@ export default function PropertyDetailScreen() {
       setNotice("Inquiry sent to the agent.");
       void queryClient.invalidateQueries({ queryKey: ["inquiries"] });
     },
-    onError: (err: Error) => {
-      if (err instanceof ApiError && err.code === "CONTACT_UNLOCK_REQUIRED") {
-        setNotice(
-          "Pay 5,000 RWF on the website to unlock seller contact, then send an inquiry here."
-        );
-        return;
-      }
-      setNotice(err.message);
-    },
+    onError: (err: Error) => setNotice(err.message),
   });
 
   const property = data?.data;
@@ -127,33 +119,23 @@ export default function PropertyDetailScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.agentName}>{property.agent.name}</Text>
-                <Text style={styles.locked}>
-                  {property.contactUnlocked ? "Contact unlocked" : "Contact locked"}
-                </Text>
+                <Text style={styles.locked}>Contact is free</Text>
               </View>
             </View>
-            {property.contactUnlocked ? (
-              <>
-                {property.agent.email ? (
-                  <Button
-                    title={`Email ${property.agent.email}`}
-                    variant="secondary"
-                    onPress={() => Linking.openURL(`mailto:${property.agent.email}`)}
-                  />
-                ) : null}
-                {property.agent.phone ? (
-                  <Button
-                    title={`Call ${property.agent.phone}`}
-                    variant="secondary"
-                    onPress={() => Linking.openURL(`tel:${property.agent.phone}`)}
-                  />
-                ) : null}
-              </>
-            ) : (
-              <Text style={styles.locked}>
-                Unlock seller contact for 5,000 RWF on umuhuzaonline.com
-              </Text>
-            )}
+            {property.agent.email ? (
+              <Button
+                title={`Email ${property.agent.email}`}
+                variant="secondary"
+                onPress={() => Linking.openURL(`mailto:${property.agent.email}`)}
+              />
+            ) : null}
+            {property.agent.phone ? (
+              <Button
+                title={`Call ${property.agent.phone}`}
+                variant="secondary"
+                onPress={() => Linking.openURL(`tel:${property.agent.phone}`)}
+              />
+            ) : null}
           </View>
 
           {notice ? <Text style={styles.notice}>{notice}</Text> : null}
