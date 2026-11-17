@@ -28,5 +28,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   if (!googleClientId) return tree;
 
-  return <GoogleOAuthProvider clientId={googleClientId}>{tree}</GoogleOAuthProvider>;
+  return (
+    <GoogleOAuthProvider clientId={googleClientId} locale="en">
+      {tree}
+    </GoogleOAuthProvider>
+  );
 }

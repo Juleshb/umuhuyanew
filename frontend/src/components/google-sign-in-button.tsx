@@ -50,7 +50,6 @@ export function GoogleSignInButton({
         size="large"
         text="continue_with"
         shape="pill"
-        locale="en"
       />
     </div>
   );
